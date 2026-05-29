@@ -1,0 +1,189 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    transition: background 0.3s, color 0.3s;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* ----- СВЕТЛАЯ ТЕМА ----- */
+body.light {
+    background: #f4f7fc;
+    color: #1e2a3e;
+    --header-bg: #2c3e50;
+    --footer-bg: #e9ecef;
+    --card-bg: #ffffff;
+    --border: #dce5ef;
+    --btn-primary: #3b82f6;
+    --btn-primary-hover: #2563eb;
+}
+body.light .header { background: var(--header-bg); color: white; }
+body.light .footer { background: var(--footer-bg); }
+body.light .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1rem; }
+body.light .nav-menu a { color: rgba(255,255,255,0.85); }
+body.light .nav-menu a:hover { background: rgba(255,255,255,0.1); }
+
+/* ----- ТЁМНАЯ ТЕМА ----- */
+body.dark {
+    background: #121212;
+    color: #e2e8f0;
+    --header-bg: #0f172a;
+    --footer-bg: #1a202c;
+    --card-bg: #1e1e2a;
+    --border: #2d3748;
+    --btn-primary: #3b82f6;
+}
+body.dark .header { background: var(--header-bg); border-bottom: 1px solid var(--border); }
+body.dark .footer { background: var(--footer-bg); }
+body.dark .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1rem; }
+body.dark .nav-menu a { color: #cbd5e1; }
+body.dark .nav-menu a:hover { background: #334155; }
+
+/* ----- ОБЩИЕ СТИЛИ ----- */
+.header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.logo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: inherit;
+}
+.burger {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: inherit;
+}
+.nav-menu {
+    transition: left 0.3s ease;
+}
+.nav-list {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+}
+.nav-list li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.2rem;
+    text-decoration: none;
+    border-radius: 2rem;
+    transition: 0.2s;
+}
+@media (max-width: 768px) {
+    .burger {
+        display: block;
+    }
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        background: var(--header-bg);
+        backdrop-filter: blur(20px);
+        padding: 5rem 1rem;
+        z-index: 1050;
+    }
+    .nav-menu.active {
+        left: 0;
+    }
+    .nav-list {
+        flex-direction: column;
+        gap: 0;
+    }
+    .nav-list li a {
+        display: block;
+        padding: 1rem;
+        border-radius: 0;
+    }
+}
+.card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+.card-header {
+    font-size: 1.4rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+input, select, textarea {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: inherit;
+}
+button, .btn {
+    border: none;
+    border-radius: 2rem;
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+button:active, .btn:active {
+    transform: scale(0.98);
+}
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.close-alert {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+.footer {
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto;
+}
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}

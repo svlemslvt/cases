@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Чаты <i class="fas fa-comments"></i></h2>
+<div class="card mb-4">
+    <div class="card-header">Поиск или создать чат</div>
+    <div class="card-body">
+        <input type="text" id="searchUser" class="form-control mb-2" placeholder="Введите имя пользователя..." autocomplete="off">
+        <div id="suggestions" class="list-group mb-2"></div>
+        <button id="startChatBtn" class="btn btn-primary">Начать чат</button>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">Диалоги</div>
+    <div class="card-body">
+        {% if dialogs %}
+            <ul class="list-group">
+            {% for dialog in dialogs %}
+                <li class="list-group-item"><a href="{{ url_for('chat', recipient=dialog) }}">{{ dialog }}</a></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>У вас пока нет диалогов. Начните переписку через поиск.</p>
+        {% endif %}
+    </div>
+</div>
+<script>
+const searchInput = document.getElementById('searchUser');
+const suggestionsDiv = document.getElementById('suggestions');
+let currentUsername = '';
+
+searchInput.addEventListener('input', async function() {
+    const query = this.value.trim();
+    if (query.length < 1) {
+        suggestionsDiv.innerHTML = '';
+        return;
+    }
+    const response = await fetch(`/search_user_autocomplete?q=${encodeURIComponent(query)}`);
+    const users = await response.json();
+    suggestionsDiv.innerHTML = '';
+    users.forEach(user => {
+        const btn = document.createElement('button');
+        btn.className = 'list-group-item list-group-item-action';
+        btn.textContent = `${user.username} (${user.phone})`;
+        btn.onclick = () => {
+            searchInput.value = user.username;
+            currentUsername = user.username;
+            suggestionsDiv.innerHTML = '';
+        };
+        suggestionsDiv.appendChild(btn);
+    });
+});
+
+document.getElementById('startChatBtn').onclick = () => {
+    const username = searchInput.value.trim();
+    if (username) {
+        window.location.href = `/chat/${encodeURIComponent(username)}`;
+    } else {
+        alert('Введите имя пользователя');
+    }
+};
+</script>
+{% endblock %}

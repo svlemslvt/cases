@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>История операций</h2>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Тип</th><th>Откуда</th><th>Куда</th><th>Сумма</th><th>Дата</th></tr>
+        </thead>
+        <tbody>
+            {% for item in history %}
+            <tr>
+                <td>{{ item.type }}</td>
+                <td>{{ item.from or '-' }}</td>
+                <td>{{ item.to or '-' }}</td>
+                <td>{{ item.amount }}</td>
+                <td>{{ item.date_str }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

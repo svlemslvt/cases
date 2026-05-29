@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-credit-card"></i> Моя банковская карта</div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="card chip" width="50">
+                </div>
+                <h4 class="mb-3">{{ card_display }}</h4>
+                <div class="row">
+                    <div class="col-6">
+                        <p><strong>Срок действия:</strong> {{ user.card_expiry }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p><strong>CVV:</strong> {{ user.card_cvv }}</p>
+                    </div>
+                </div>
+                <hr>
+                <p><strong>ID пользователя:</strong> {{ user.user_id }}</p>
+                <p><strong>Владелец:</strong> {{ session.username }}</p>
+                <p class="text-muted small">Карта виртуальная, все данные сгенерированы автоматически.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

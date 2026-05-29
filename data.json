@@ -1,0 +1,24 @@
+{
+    "users": {
+        "admin": {
+            "password": "$2b$12$Ifei2SCKoPvqc4Q.3WOdZeU3lewo8sYD6WBrBrjbLX1So5yJRGVBW",
+            "balance": 10000.0,
+            "card_number": "1111222233334444",
+            "phone": "",
+            "is_admin": 1,
+            "settings": {
+                "theme": "light",
+                "language": "ru"
+            },
+            "transfer_history": [],
+            "chats": {},
+            "groups": [],
+            "user_id": "23924f70ae4a5f63a7afe4eb",
+            "card_expiry": "12/28",
+            "card_cvv": "123",
+            "last_seen": 1778335052.830961,
+            "online_status": true
+        }
+    },
+    "groups": {}
+}

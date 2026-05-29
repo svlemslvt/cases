@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Мои группы <i class="fas fa-users"></i></h2>
+<div class="card mb-4">
+    <div class="card-header">Создать новую группу</div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('create_group') }}">
+            <input type="text" name="name" class="form-control mb-2" placeholder="Название группы" required>
+            <button class="btn btn-primary">Создать</button>
+        </form>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">Список групп</div>
+    <div class="list-group list-group-flush">
+        {% for gid, group in groups.items() %}
+            <a href="{{ url_for('group_chat', group_id=gid) }}" class="list-group-item list-group-item-action">
+                {{ group.name }} (участников: {{ group.members|length }})
+            </a>
+        {% else %}
+            <div class="list-group-item">У вас пока нет групп. Создайте первую!</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

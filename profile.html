@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">Мой профиль</div>
+            <div class="card-body">
+                <p><strong>Логин:</strong> {{ session.username }}</p>
+                <p><strong>Номер карты:</strong> {{ card_display }}</p>
+                <p><strong>Телефон:</strong> {{ user.phone }}</p>
+                <p><strong>Баланс:</strong> {{ user.balance }} ₽</p>
+                <p><strong>ID пользователя:</strong> {{ user.user_id }}</p>
+                <p><strong>Статус:</strong> {% if user.is_admin %}Администратор{% else %}Пользователь{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

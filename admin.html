@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Панель администратора</h3>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Изменить баланс</div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- Исправление 1: CSRF токен -->
+                    <input type="hidden" name="action" value="change_balance">
+                    <div class="mb-2"><input type="text" name="target_user" class="form-control" placeholder="Логин" required></div>
+                    <div class="mb-2"><input type="number" step="0.01" name="amount" class="form-control" placeholder="Сумма (+/-)" required></div>
+                    <button class="btn btn-primary">Изменить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Права админа</div>
+            <div class="card-body">
+                <form method="POST" class="mb-2">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="make_admin">
+                    <input type="text" name="target_user" placeholder="Логин" required>
+                    <button class="btn btn-success">Сделать админом</button>
+                </form>
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="remove_admin">
+                    <input type="text" name="target_user" placeholder="Логин" required>
+                    <button class="btn btn-warning">Забрать админку</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<h4>Список пользователей</h4>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Логин</th><th>Баланс</th><th>Карта</th><th>Админ</th></tr>
+        </thead>
+        <tbody>
+            {% for name, u in users.items() %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>{{ u.balance }}</td>
+                <td>{% if u.card_masked %}{{ u.card_masked }}{% else %}****{% endif %}</td> <!-- Исправление 2: маскируем номер карты -->
+                <td>{% if u.is_admin %}✅{% else %}❌{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="chat-header">
+    <h2>{{ group.name }}</h2>
+    <span>Групповой чат</span>
+</div>
+<div class="card mb-3" style="height: 400px; overflow-y: auto;">
+    <div class="card-body">
+        {% for msg in group.messages %}
+            <div class="message {% if msg.from == session.username %}my-message{% else %}other-message{% endif %}">
+                <b>{{ msg.from }}:</b>
+                {% if msg.type == 'text' %}<p>{{ msg.text }}</p>{% endif %}
+                {% if msg.type == 'image' %}<img src="{{ msg.file }}" class="message-image">{% endif %}
+                {% if msg.type == 'audio' %}<audio controls src="{{ msg.file }}"></audio>{% endif %}
+                <small>{{ msg.timestamp|timestamp_to_str }}</small>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="chat-input">
+    <form method="POST" action="{{ url_for('send_group_message') }}" enctype="multipart/form-data">
+        <input type="hidden" name="group_id" value="{{ group_id }}">
+        <textarea name="message" class="form-control mb-2" placeholder="Сообщение..."></textarea>
+        <div class="d-flex gap-2">
+            <input type="file" name="file" accept="image/*,audio/*" class="form-control">
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </div>
+    </form>
+</div>
+<div class="mt-3">
+    <details>
+        <summary>Участники ({{ group.members|length }})</summary>
+        <ul>
+            {% for member in group.members %}
+                <li>{{ member }}</li>
+            {% endfor %}
+        </ul>
+    </details>
+    <form method="POST" action="{{ url_for('add_to_group') }}" class="mt-2">
+        <input type="hidden" name="group_id" value="{{ group_id }}">
+        <div class="input-group">
+            <input type="text" name="username" class="form-control" placeholder="Логин пользователя">
+            <button class="btn btn-sm btn-success">Добавить в группу</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

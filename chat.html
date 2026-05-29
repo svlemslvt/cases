@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="chat-header">
+    <h2>{{ recipient }}</h2>
+    <span class="status">{{ target_status }}</span>
+</div>
+<div class="chat-messages" id="chatMessages">
+    {% for msg in messages %}
+        <div class="message {% if msg.from == session.username %}my-message{% else %}other-message{% endif %}" data-msg-id="{{ msg.id }}">
+            <div class="message-content">
+                {% if msg.type == 'text' %}<p>{{ msg.text }}</p>
+                {% elif msg.type == 'image' %}<img src="{{ msg.file }}" class="message-image">
+                {% elif msg.type == 'audio' %}<audio controls src="{{ msg.file }}"></audio>{% endif %}
+            </div>
+            <div class="message-meta"><span class="time">{{ msg.date_str }}</span>
+                {% if msg.from == session.username %}
+                    <span class="delivery-status">{% if msg.read %}<i class="fas fa-check-double" style="color:#34b7f1"></i>{% elif msg.delivered %}<i class="fas fa-check-double"></i>{% else %}<i class="fas fa-check"></i>{% endif %}</span>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<div class="chat-input">
+    <form id="messageForm" enctype="multipart/form-data">
+        <input type="hidden" name="recipient" value="{{ recipient }}">
+        <div class="message-input-area">
+            <textarea name="message" id="messageText" placeholder="Сообщение..." rows="1"></textarea>
+            <label class="file-button">
+                <i class="fas fa-paperclip"></i>
+                <input type="file" name="file" style="display:none">
+            </label>
+            <button type="submit" class="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </form>
+</div>
+<script>
+    const recipient = '{{ recipient }}';
+    let lastMsgId = {{ messages[-1].id if messages else 0 }};
+    const messagesDiv = document.getElementById('chatMessages');
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    function appendMessage(msg) {
+        const div = document.createElement('div');
+        div.className = `message ${msg.from === '{{ session.username }}' ? 'my-message' : 'other-message'}`;
+        div.setAttribute('data-msg-id', msg.id);
+        let content = '';
+        if(msg.type==='text') content = `<p>${escapeHtml(msg.text)}</p>`;
+        else if(msg.type==='image') content = `<img src="${msg.file}" class="message-image">`;
+        else if(msg.type==='audio') content = `<audio controls src="${msg.file}"></audio>`;
+        div.innerHTML = `<div class="message-content">${content}</div><div class="message-meta"><span class="time">${msg.date_str}</span>${msg.from === '{{ session.username }}' ? '<span class="delivery-status"><i class="fas fa-check"></i></span>' : ''}</div>`;
+        messagesDiv.appendChild(div);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    async function sendMessage(text, file=null) {
+        const fd = new FormData();
+        fd.append('recipient', recipient);
+        if(text) fd.append('message', text);
+        if(file) fd.append('file', file);
+        const tempId = Date.now();
+        const tempMsg = { id: tempId, from: '{{ session.username }}', to: recipient, text: text || '', timestamp: Date.now()/1000, type: file ? (file.type.startsWith('image/')?'image':(file.type.startsWith('audio/')?'audio':'text')) : 'text', file: file ? URL.createObjectURL(file) : null, date_str: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
+        appendMessage(tempMsg);
+        const response = await fetch('/send_message', { method: 'POST', body: fd });
+        if(response.ok) {
+            const tempDiv = document.querySelector(`.message[data-msg-id="${tempId}"]`);
+            if(tempDiv) tempDiv.remove();
+            await fetchNewMessages(true);
+            document.getElementById('messageText').value = '';
+            document.querySelector('input[type="file"]').value = '';
+        } else {
+            alert('Ошибка отправки');
+            const tempDiv = document.querySelector(`.message[data-msg-id="${tempId}"]`);
+            if(tempDiv) tempDiv.remove();
+        }
+    }
+    async function fetchNewMessages() {
+        const resp = await fetch(`/get_updates/${recipient}?last_id=${lastMsgId}`);
+        const data = await resp.json();
+        if(data.messages && data.messages.length) {
+            for(let m of data.messages) {
+                if(!document.querySelector(`.message[data-msg-id="${m.id}"]`)) {
+                    appendMessage(m);
+                    if(m.id > lastMsgId) lastMsgId = m.id;
+                }
+            }
+            await fetch('/mark_delivered', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sender:recipient}) });
+        }
+        setTimeout(fetchNewMessages, 2000);
+    }
+    document.getElementById('messageForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const text = document.getElementById('messageText').value.trim();
+        const fileInput = document.querySelector('input[type="file"]');
+        const file = fileInput.files[0];
+        if(text) await sendMessage(text);
+        else if(file) await sendMessage('', file);
+    };
+    document.getElementById('messageText').addEventListener('keypress', (e) => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('messageForm').dispatchEvent(new Event('submit')); } });
+    window.onload = () => { messagesDiv.scrollTop = messagesDiv.scrollHeight; fetchNewMessages(); };
+</script>
+{% endblock %}
